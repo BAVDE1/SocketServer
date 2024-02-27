@@ -1,0 +1,69 @@
+body {
+    background-color: #4d4d4d;
+    font-family: 'FreeMono', monospace;
+    margin: 0;
+    padding: 0;
+
+    /* border: dashed #222222; */
+}
+
+.parallelogram, .parallelogram-r {
+    position: absolute;
+	width: 80px;
+	height: 80px;
+    bottom: 0px;
+	transform: skew(-20deg);
+	background: #222222;
+
+    margin-left: calc(100% - 60px);
+}
+
+.parallelogram-r {
+    width: 30px;
+    margin-left: calc(100% + 40px);
+}
+
+.navbar {
+    position: absolute;
+    background-color: #222222;
+
+    top: 0;
+    height: 80px;
+	width: 40%;
+    min-width: 350px;
+}
+
+.navbar a {
+    font-weight: bold;
+    font-size: 25px;
+    letter-spacing: 5px;
+
+    padding-top: 23px;
+    padding-left: 80px;
+
+    display: block;
+    color: white;
+    text-decoration: none;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+}
+
+.page {
+    position: absolute;
+    background-color: rgb(220, 220, 220);
+    right: 20%;
+    left: 20%;
+    width: 50%;
+    min-width: 350px;
+    margin-top: 80px;
+
+    padding-top: 20px;
+    padding-bottom: 40px;
+    padding-left: 40px;
+    padding-right: 40px;
+
+    box-shadow: 0 0 20px -2px;
+}
