@@ -34,16 +34,27 @@ body {
 }
 
 .navbar a {
+    text-decoration: none;
+}
+
+.nav-text {
     font-weight: bold;
     font-size: 25px;
     letter-spacing: 5px;
 
-    padding-top: 23px;
-    padding-left: 80px;
+    padding-top: 25px;
+    padding-left: 100px;
 
     display: block;
     color: white;
-    text-decoration: none;
+}
+
+.navbar img {
+    position: absolute;
+    top: 0;
+    margin: 15px;
+    margin-left: 20px;
+    width: 50px;
 }
 
 .footer {
