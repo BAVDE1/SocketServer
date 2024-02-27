@@ -23,6 +23,19 @@ body {
     margin-left: calc(100% + 40px);
 }
 
+.square-divider, .square-divider-white {
+    position: absolute;
+    margin-top: 15px;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    background-color: #222222;
+}
+
+.square-divider-white {
+    background-color: #ffffff;
+}
+
 .navbar {
     position: absolute;
     background-color: #222222;
@@ -30,7 +43,7 @@ body {
     top: 0;
     height: 80px;
 	width: 40%;
-    min-width: 350px;
+    min-width: 400px;
 }
 
 .navbar a {
@@ -43,6 +56,7 @@ body {
     letter-spacing: 5px;
 
     padding-top: 25px;
+    padding-bottom: 25px;
     padding-left: 100px;
 
     display: block;
@@ -57,6 +71,39 @@ body {
     width: 50px;
 }
 
+.nav-list {
+    background-color: #ffffff;
+    padding: 0;
+    margin: 0;
+}
+
+.folders {
+    margin: 0;
+    padding-left: 30px;
+    padding-top: 40px;
+    padding-bottom: 20px;
+}
+
+.folders li {
+    padding-top: 15px;
+    list-style: none;
+    font-weight: bolder;
+}
+
+.folders li:before {
+    content: "> ";
+}
+
+.items li {
+    padding-top: 0;
+    list-style: none;
+    font-weight: normal;
+}
+
+.items li:before {
+    content: "";
+}
+
 .footer {
     position: absolute;
     bottom: 0;
@@ -68,7 +115,7 @@ body {
     right: 20%;
     left: 20%;
     width: 50%;
-    min-width: 350px;
+    min-width: 400px;
     margin-top: 80px;
 
     padding-top: 20px;
