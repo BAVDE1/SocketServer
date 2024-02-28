@@ -114,6 +114,7 @@ void listenToSocket(int ServerSocket) {
 }
 
 void main() {
+    sqlite3* a = connectToDB();
     // Initialisation
     WSADATA wsaData;
     int startupResult = WSAStartup(MAKEWORD(2, 2), &wsaData);  // winsock ver 2.2
