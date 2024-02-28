@@ -135,12 +135,6 @@ struct HTTPResponse getResponse(char *request) {
     struct mappedRoute routeMap = getMappedRoute(request);
 
     response.body = getBody(routeMap);
-    // incorrent read, try again
-    while (response.body.size < 0) {
-        printf("Response body size too small (%d), retrying", response.body.size);
-        response.body = getBody(routeMap);
-    }
-    
     response.header = getHeader(routeMap, response.body.size);
     return response;
 }
