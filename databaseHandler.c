@@ -6,6 +6,7 @@
 
 
 sqlite3 *connectToDB() {
+    // Dont forget to close the connection
     sqlite3 *db;
     if (sqlite3_open(DB_NAME, &db) != SQLITE_OK) {
         printf("ERROR: failed to open db (%s)", sqlite3_errmsg(db));
@@ -15,10 +16,25 @@ sqlite3 *connectToDB() {
 }
 
 int initialiseDB() {
-    executeRawSql("CREATE TABLE IF NOT EXISTS folders ('pk' INTEGER, 'dat' TEXT)");
+    char *foldersTableQuery = "CREATE TABLE IF NOT EXISTS 'folders' ("
+                                "'id'	INTEGER NOT NULL UNIQUE,"
+                                "'name'	TEXT,"
+                                "'folder_order'	INTEGER,"
+                                "PRIMARY KEY('id' AUTOINCREMENT));";
+    executeRawSql(foldersTableQuery);
 
-    char *params[2] = {"YARharhar", "dataaaa"};
-    executeSqlText("INSERT INTO folders values(?, ?)", params, 2);
+    char *filesTableQuery = "CREATE TABLE IF NOT EXISTS 'files' ("
+                            "'id'	INTEGER NOT NULL UNIQUE,"
+                            "'name'	TEXT,"
+                            "'path'	TEXT,"
+                            "'folder_id'	INTEGER,"
+                            "'last_updated'	TEXT,"
+                            "PRIMARY KEY('id' AUTOINCREMENT));";
+    executeRawSql(filesTableQuery);
+
+    // char *params[2] = {"YARharhar", "1"};
+    // executeSqlParams("INSERT INTO folders(name, folder_order) VALUES(?, ?)", params, 2);
+    printf("Initialised database!\n");
     return 1;
 }
 
@@ -36,7 +52,7 @@ int executeRawSql(char *query) {
     return returnVal;
 }
 
-int executeSqlText(char *query, char **params, int nParams) {
+int executeSqlParams(char *query, char **params, int nParams) {
     // Put `nParams` number of `params` array into `query`, and execute
     int returnVal = 1;
     sqlite3 *db = connectToDB();

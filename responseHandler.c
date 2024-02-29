@@ -21,10 +21,10 @@ struct HTTPResponse {
 };
 
 struct mappedRoute {
-    char *type;
-    char *route;
-    char *template;
-    char *statusCode;
+    char *type;  // GET POST
+    char *route;  // /
+    char *template;  // filepath
+    char *statusCode;  // 200
 };
 
 static struct mappedRoute registeredRoutes[] = {

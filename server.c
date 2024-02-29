@@ -3,12 +3,13 @@
 #include <WS2tcpip.h>
 #pragma comment(lib, "Ws2_32.lib")
 
-#include "requestHandler.c"
+#include "responseHandler.c"
 #include "databaseHandler.c"
 
 #define DEFAULT_PORT "8080"
 #define REQUEST_SIZE 1024
 #define RESPONSE_SIZE 1000000
+#define SHOW_LOGS 0
 
 /*
 Server:
@@ -54,8 +55,10 @@ int clientConnectionHandler(int ServerSocket) {
     char request[REQUEST_SIZE];
     memset(request, 0, REQUEST_SIZE);
     int bytesRecieved = recv(ClientSocket, request, REQUEST_SIZE, 0);
-    printf("Connection found, recieved (%d) bytes from client):", bytesRecieved);
-    printInBlock(request);
+    if (SHOW_LOGS) {
+        printf("Connection found, recieved (%d) bytes from client):", bytesRecieved);
+        printInBlock(request);
+    }
 
     if (bytesRecieved > 0) {
         // Send back to the client
@@ -66,8 +69,10 @@ int clientConnectionHandler(int ServerSocket) {
             printf("send failed: %d (header: %d, body %d)\n", WSAGetLastError(), sentHeader, sentBody);
             closeAndCleanup(ServerSocket);
         }
-        printf("\nSent back (%d) bytes to the client", sentBody + sentHeader);
-        printInBlock(response.body.contents);
+        if (SHOW_LOGS) {
+            printf("\nSent back (%d) bytes to the client", sentBody + sentHeader);
+            printInBlock(response.body.contents);
+        }
 
         // Cleanup response
         free(response.body.contents);
@@ -83,7 +88,9 @@ int clientConnectionHandler(int ServerSocket) {
 
     // Cleanup connection
     closesocket(ClientSocket);
-    printf("Closed connection with client\n\n");
+    if (SHOW_LOGS) {
+        printf("Closed connection with client\n\n");
+    }
     return 1;
 }
 
