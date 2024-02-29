@@ -3,17 +3,13 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #pragma comment(lib, "Ws2_32.lib")
+#include "databaseHandler.c"
 
 #define F_OK 0
 #define HEADER_SIZE 1024
 #define GET "GET"
 #define SC_ACCEPT "200"
 #define SC_NOT_FOUND "404"
-
-struct data {
-    int size;
-    char *contents;
-};
 
 struct HTTPResponse {
     struct data header;
@@ -52,10 +48,27 @@ int isAllowedExt(char *ext) {
     return allowed;
 }
 
-struct mappedRoute getMappedRoute(char *request) {
+int isApiRequest(char *requestRoute) {
+    char *api = "/api/";
+    return strncmp(requestRoute, api, strlen(api)) == 0;
+}
+
+int getApiResponse(char *requestRoute) {
+    strtok(requestRoute, "/");  // remove first part of route (/api)
+    char *APIrequestType = strtok(NULL, "?");
+    char *APIrequestParams = strtok(NULL, "");
+    printf("%s, %s\n", APIrequestType, APIrequestParams);
+
+    if (strcmp(APIrequestType, "folders") == 0) {
+        printf("getting folders\n");
+        struct data foldersJson = getFoldersJson();
+        printf("f: %s (%d)\n", foldersJson.contents, foldersJson.size);
+    }
+    return 1;
+}
+
+struct mappedRoute getMappedRoute(char *requestType, char *requestRoute) {
     // split request into type and route
-    char *requestType = strtok(request, " ");
-    char *requestRoute = strtok(NULL, " ");
     char *routePath = requestRoute + 1;
     char *pathExt = getFileExt(requestRoute);
 
@@ -131,10 +144,17 @@ struct data getBody(struct mappedRoute routeMap) {
 struct HTTPResponse getResponse(char *request) {
     struct HTTPResponse response;
 
-    // find pre-mapped struct for request
-    struct mappedRoute routeMap = getMappedRoute(request);
+    char *requestType = strtok(request, " ");
+    char *requestRoute = strtok(NULL, " ");
 
-    response.body = getBody(routeMap);
-    response.header = getHeader(routeMap, response.body.size);
+    if (!isApiRequest(requestRoute)) {
+        // find pre-mapped struct for request
+        struct mappedRoute routeMap = getMappedRoute(requestType, requestRoute);
+        response.body = getBody(routeMap);
+        response.header = getHeader(routeMap, response.body.size);
+    } else {
+        // handle API request
+        getApiResponse(requestRoute);
+    }
     return response;
 }

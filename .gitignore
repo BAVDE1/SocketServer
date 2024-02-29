@@ -4,6 +4,7 @@ client.pdb
 server.ilk
 server.obj
 server.pdb
+databasehandler.obj
 
 vc140.pdb
 

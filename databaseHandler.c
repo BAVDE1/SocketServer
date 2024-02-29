@@ -5,6 +5,26 @@
 #define DB_FOLDERS_TABLE "folders"
 
 
+struct data {
+    int size;
+    char *contents;
+};
+
+struct folder {
+    int id;
+    const unsigned char *name;
+    int folder_order;
+};
+
+struct file {
+    int id;
+    char *name;
+    char *path;
+    int folder_id;
+    char *last_updated;
+};
+
+
 sqlite3 *connectToDB() {
     // Dont forget to close the connection
     sqlite3 *db;
@@ -13,6 +33,35 @@ sqlite3 *connectToDB() {
         return 0;
     }
     return db;
+}
+
+struct data getFoldersJson() {
+    char *query = "SELECT * FROM folders";
+    sqlite3 *db = connectToDB();
+    sqlite3_stmt *stmt;
+
+    // prep query
+    int prep = sqlite3_prepare_v2(db, query, -1, &stmt, NULL);
+
+    char *objects = "";
+
+    // loop through each row returned from query
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        struct folder fldr;
+        fldr.id = sqlite3_column_int(stmt, 0);
+        fldr.name = sqlite3_column_text(stmt, 1);
+        fldr.folder_order = sqlite3_column_int(stmt, 2);
+        sprintf(objects, "%s{id: %d, name: '%s', folder_order: %d},", objects, fldr.id, fldr.name, fldr.folder_order);
+    }
+    objects[strlen(objects)-1] = '\0';  // remove trailing comma
+    struct data data;
+    data.size = strlen(objects) + 3;  // +2 for square brackets, +1 for \0
+    data.contents = malloc(data.size);
+    snprintf(data.contents, data.size, "[%s]", objects);
+
+    int f = sqlite3_finalize(stmt);
+    int c = sqlite3_close(db);
+    return data;
 }
 
 int initialiseDB() {

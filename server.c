@@ -4,7 +4,7 @@
 #pragma comment(lib, "Ws2_32.lib")
 
 #include "responseHandler.c"
-#include "databaseHandler.c"
+// #include "databaseHandler.c"
 
 #define DEFAULT_PORT "8080"
 #define REQUEST_SIZE 1024
