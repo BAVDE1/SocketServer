@@ -55,8 +55,8 @@ int clientConnectionHandler(int ServerSocket) {
     char request[REQUEST_SIZE];
     memset(request, 0, REQUEST_SIZE);
     int bytesRecieved = recv(ClientSocket, request, REQUEST_SIZE, 0);
+    printf("\nConnection found, recieved (%d) bytes from client", bytesRecieved);
     if (SHOW_LOGS) {
-        printf("Connection found, recieved (%d) bytes from client):", bytesRecieved);
         printInBlock(request);
     }
 
@@ -69,8 +69,8 @@ int clientConnectionHandler(int ServerSocket) {
             printf("send failed: %d (header: %d, body %d)\n", WSAGetLastError(), sentHeader, sentBody);
             closeAndCleanup(ServerSocket);
         }
+        printf("\nSent back (%d) bytes to the client", sentBody + sentHeader);
         if (SHOW_LOGS) {
-            printf("\nSent back (%d) bytes to the client", sentBody + sentHeader);
             printInBlock(response.body.contents);
         }
 

@@ -60,9 +60,8 @@ int getApiResponse(char *requestRoute) {
     printf("%s, %s\n", APIrequestType, APIrequestParams);
 
     if (strcmp(APIrequestType, "folders") == 0) {
-        printf("getting folders\n");
-        struct data foldersJson = getFoldersJson();
-        printf("f: %s (%d)\n", foldersJson.contents, foldersJson.size);
+        struct data foldersJson = getTableJson(DB_FILES_TABLE);
+        printf("f: %s (size: %d)\n", foldersJson.contents, foldersJson.size);
     }
     return 1;
 }

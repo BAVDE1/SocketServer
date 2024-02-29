@@ -2,7 +2,8 @@
 #include "sqlite3.c"
 
 #define DB_NAME "internal.db"
-#define DB_FOLDERS_TABLE "folders"
+#define DB_FOLDERS_TABLE 1
+#define DB_FILES_TABLE 0
 
 
 struct data {
@@ -35,29 +36,53 @@ sqlite3 *connectToDB() {
     return db;
 }
 
-struct data getFoldersJson() {
-    char *query = "SELECT * FROM folders";
+char *getFolderJsonFromStmt(sqlite3_stmt *stmt) {
+    // return json-like string containing elements of the given folder row from db
+    char *string = "";
+
+    struct folder fldr;
+    fldr.id = sqlite3_column_int(stmt, 0);
+    fldr.name = sqlite3_column_text(stmt, 1);
+    fldr.folder_order = sqlite3_column_int(stmt, 2);
+
+    sprintf(string, "{id: %d, name: '%s', folder_order: %d},", fldr.id, fldr.name, fldr.folder_order);
+    return string;
+}
+
+struct data getTableJson(int DBtable) {
+    // return json-like string of rows from given table
     sqlite3 *db = connectToDB();
     sqlite3_stmt *stmt;
-
+    char *query = "SELECT * FROM folders";
+    if (DBtable == DB_FILES_TABLE) {
+        query = "SELECT * FROM files";
+    }
+    
     // prep query
     int prep = sqlite3_prepare_v2(db, query, -1, &stmt, NULL);
 
-    char *objects = "";
+    char objects[1024] = "";
 
-    // loop through each row returned from query
+    // loop through each row returned from query, store json-like string into `objects`
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        struct folder fldr;
-        fldr.id = sqlite3_column_int(stmt, 0);
-        fldr.name = sqlite3_column_text(stmt, 1);
-        fldr.folder_order = sqlite3_column_int(stmt, 2);
-        sprintf(objects, "%s{id: %d, name: '%s', folder_order: %d},", objects, fldr.id, fldr.name, fldr.folder_order);
+        char *addition;
+        if (DBtable == DB_FOLDERS_TABLE) {
+            addition = getFolderJsonFromStmt(stmt);
+        }
+        snprintf(objects, strlen(objects) + strlen(addition), "%s%s", objects, addition);
     }
-    objects[strlen(objects)-1] = '\0';  // remove trailing comma
+
     struct data data;
-    data.size = strlen(objects) + 3;  // +2 for square brackets, +1 for \0
-    data.contents = malloc(data.size);
-    snprintf(data.contents, data.size, "[%s]", objects);
+    if (strlen(objects) > 0) {
+        objects[strlen(objects)-1] = '\0';  // remove trailing comma
+        data.size = strlen(objects) + 3;  // +2 for square brackets, +1 for \0
+        data.contents = malloc(data.size);
+        snprintf(data.contents, data.size, "[%s]", objects);
+    } else {
+        // no objects, empty list
+        data.size = 3;
+        data.contents = "[]";
+    }
 
     int f = sqlite3_finalize(stmt);
     int c = sqlite3_close(db);
