@@ -28,7 +28,7 @@ struct mappedRoute {
 
 struct apiRoute {
     char *type;  // e.g. "folders", "files"
-    jsonFunction jsonFunc;  // function to be called to get json-like string
+    jsonFunction jsonFunc;  // function to be called to get data struct for body
     int jsonFuncParam;  // parameter passed to the jsonFunc
 };
 
@@ -45,7 +45,7 @@ static struct apiRoute registeredApiRoutes[] = {
     {"404", get404Json, 1},
 };
 
-static char *allowedExt[] = {"css", "js", "html", "png", "jpg", "jpeg", "json"};
+static char *allowedExt[] = {"css", "js", "html", "png", "jpg", "jpeg", "json", "txt"};
 static char *imageExt[] = {"png", "jpg", "jpeg"};
 
 

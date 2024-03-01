@@ -1,4 +1,35 @@
 
+<script>
+  $(document).ready(function () {
+    // load folders, then files
+    AjaxRequest("/api/folders", loadFolders);
+  });
+
+  function loadFolders(data) {
+    contents = "";
+    for (let i = 0; i < data.length; i++) {
+      d = data[i];
+      contents += `<li>${d.name}<ul id="folder-${d.id}" class="items"></ul></li>`;
+    }
+    document.getElementById("folders").innerHTML = contents;
+
+    AjaxRequest("/api/files", loadFiles);
+  };
+
+  function loadFiles(data) {
+    for (let i = 0; i < data.length; i++) {
+      d = data[i];
+      folderElem = document.getElementById("folder-" + d.folder_id);
+      if (folderElem) {
+        contents = folderElem.innerHTML;
+        contents += `<li><a href="${d.path}">${d.name}</a></li>`;
+        folderElem.innerHTML = contents;
+      }
+    }
+  }
+</script>
+
+
 <nav class="navbar">
   <a href="/">
     <img src="files/images/logo.png">
@@ -13,8 +44,9 @@
   <div class="square-divider"></div>
 
   <div class="nav-list">
-    <ul class="folders">
-      <li>
+    <ul id="folders" class="folders">
+      <p><strong>Loading files...</strong></p>
+      <!-- <li>
         folder a
 
         <ul class="items">
@@ -30,7 +62,7 @@
         <ul class="items">
           <li>item b.a</li>
         </ul>
-      </li>
+      </li> -->
     </ul>
   </div>
 

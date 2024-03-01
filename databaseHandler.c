@@ -65,7 +65,7 @@ char *getFileJsonFromStmt(sqlite3_stmt *stmt) {
 }
 
 struct data getTableJson(int DBtable) {
-    // return json-like string of rows from given table
+    // return data struct containing all rows from given table
     sqlite3 *db = connectToDB();
     sqlite3_stmt *stmt;
     char *query = "SELECT * FROM folders";
