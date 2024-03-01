@@ -107,6 +107,7 @@ struct data getTableJson(int DBtable) {
         data.contents = "[]";
     }
 
+    free(objects);
     sqlite3_finalize(stmt);
     sqlite3_close(db);
     return data;

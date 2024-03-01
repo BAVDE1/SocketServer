@@ -7,7 +7,7 @@
 
 #define DEFAULT_PORT "8080"
 #define REQUEST_SIZE 1024
-#define SHOW_LOGS 1
+#define SHOW_LOGS 0
 
 /*
 Server:

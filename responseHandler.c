@@ -49,9 +49,9 @@ static char *allowedExt[] = {"css", "js", "html", "png", "jpg", "jpeg", "json"};
 static char *imageExt[] = {"png", "jpg", "jpeg"};
 
 
-char *getFileExt(char *filename) {
-    char *dot = strrchr(filename, '.');
-    if (!dot || dot == filename) return "";
+char *getFileExt(char *route) {
+    char *dot = strrchr(route, '.');
+    if (!dot || dot == route) return " ";
     return dot + 1;
 }
 
@@ -87,7 +87,7 @@ struct mappedRoute getMappedRoute(char *requestType, char *requestRoute) {
     struct mappedRoute route = registeredRoutes[nRegistered - 1];  // 404 by default
 
     // find route
-    if (strcmp(pathExt, "") == 0) {
+    if (strcmp(pathExt, " ") == 0) {
         // find route via registered routes
         for (int i = 0; i < nRegistered; i++) {
             struct mappedRoute r = registeredRoutes[i];
