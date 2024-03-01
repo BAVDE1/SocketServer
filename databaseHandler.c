@@ -14,7 +14,6 @@ struct data {
 struct folder {
     int id;
     const unsigned char *name;
-    int folder_order;
 };
 
 struct file {
@@ -43,9 +42,8 @@ char *getFolderJsonFromStmt(sqlite3_stmt *stmt) {
     struct folder fldr;
     fldr.id = sqlite3_column_int(stmt, 0);
     fldr.name = sqlite3_column_text(stmt, 1);
-    fldr.folder_order = sqlite3_column_int(stmt, 2);
 
-    sprintf(string, "{\"id\": %d, \"name\": \"%s\", \"folder_order\": %d},", fldr.id, fldr.name, fldr.folder_order);
+    sprintf(string, "{\"id\": %d, \"name\": \"%s\"},", fldr.id, fldr.name);
     return string;
 }
 
@@ -117,7 +115,6 @@ int initialiseDB() {
     char *foldersTableQuery = "CREATE TABLE IF NOT EXISTS 'folders' ("
                                 "'id'	INTEGER NOT NULL UNIQUE,"
                                 "'name'	TEXT,"
-                                "'folder_order'	INTEGER,"
                                 "PRIMARY KEY('id' AUTOINCREMENT));";
     executeRawSql(foldersTableQuery);
 
