@@ -12,6 +12,7 @@
 #define SC_NOT_FOUND "404"
 
 typedef struct data (*jsonFunction)();
+struct data get404Json(int);  // pre-define
 
 struct HTTPResponse {
     struct data header;
@@ -39,7 +40,9 @@ static struct mappedRoute registeredRoutes[] = {
 
 static struct apiRoute registeredApiRoutes[] = {
     {"folders", getTableJson, DB_FOLDERS_TABLE},
-    {"files", getTableJson, DB_FILES_TABLE}
+    {"files", getTableJson, DB_FILES_TABLE},
+
+    {"404", get404Json, 1},
 };
 
 static char *allowedExt[] = {"css", "js", "html", "png", "jpg", "jpeg", "json"};
@@ -66,24 +69,13 @@ int isApiRequest(char *requestRoute) {
     return strncmp(requestRoute, api, strlen(api)) == 0;
 }
 
-struct data getApiBody(char *requestRoute) {
-    strtok(requestRoute, "/");  // remove first part of route (/api)
-    char *APIrequestType = strtok(NULL, "?");
-    char *APIrequestParams = strtok(NULL, "");
-
-    // find matching registered api
-    int nRegistered = sizeof(registeredApiRoutes) / sizeof(registeredApiRoutes[0]);
-    struct apiRoute apiRoute;
-    for (int i = 0; i < nRegistered; i++) {
-        struct apiRoute r = registeredApiRoutes[i];
-        if (strcmp(r.type, APIrequestType) == 0) {
-            apiRoute = r;
-            break;
-        }
-    }
-
-    struct data bodyData = apiRoute.jsonFunc(apiRoute.jsonFuncParam);
-    return bodyData;
+struct data get404Json(int i) {
+    // json response for a 404
+    struct data data;
+    data.size = 3;
+    data.contents = malloc(data.size);
+    snprintf(data.contents, data.size + 1, "404");
+    return data;
 }
 
 struct mappedRoute getMappedRoute(char *requestType, char *requestRoute) {
@@ -161,6 +153,27 @@ struct data getBody(struct mappedRoute routeMap) {
 
     fclose(fptr);
     return file;
+}
+
+struct data getApiBody(char *requestRoute) {
+    strtok(requestRoute, "/");  // remove first part of route (/api)
+    char *APIrequestType = strtok(NULL, "?");
+    char *APIrequestParams = strtok(NULL, "");
+
+    int nRegistered = sizeof(registeredApiRoutes) / sizeof(registeredApiRoutes[0]);
+    struct apiRoute apiRoute = registeredApiRoutes[nRegistered - 1]; // 404 by default
+
+    // find matching registered api
+    for (int i = 0; i < nRegistered; i++) {
+        struct apiRoute r = registeredApiRoutes[i];
+        if (strcmp(r.type, APIrequestType) == 0) {
+            apiRoute = r;
+            break;
+        }
+    }
+
+    struct data bodyData = apiRoute.jsonFunc(apiRoute.jsonFuncParam);
+    return bodyData;
 }
 
 struct HTTPResponse getResponse(char *request) {

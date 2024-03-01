@@ -7,7 +7,7 @@
 
 #define DEFAULT_PORT "8080"
 #define REQUEST_SIZE 1024
-#define SHOW_LOGS 0
+#define SHOW_LOGS 1
 
 /*
 Server:
@@ -63,6 +63,7 @@ int clientConnectionHandler(int ServerSocket) {
         struct HTTPResponse response = getResponse(request);
         int sentHeader = send(ClientSocket, response.header.contents, response.header.size, 0);
         int sentBody = send(ClientSocket, response.body.contents, response.body.size, 0);
+
         if (sentHeader == SOCKET_ERROR || sentBody == SOCKET_ERROR) {
             printf("send failed: %d (header: %d, body %d)\n", WSAGetLastError(), sentHeader, sentBody);
             closeAndCleanup(ServerSocket);
