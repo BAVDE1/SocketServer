@@ -11,16 +11,24 @@
 #define SC_ACCEPT "200"
 #define SC_NOT_FOUND "404"
 
+typedef struct data (*jsonFunction)();
+
 struct HTTPResponse {
     struct data header;
     struct data body;
 };
 
 struct mappedRoute {
-    char *type;  // GET, POST
+    char *type;  // e.g. GET, POST
     char *route;
     char *template;  // template filepath
-    char *statusCode;  // 200
+    char *statusCode;  // e.g. 200
+};
+
+struct apiRoute {
+    char *type;  // e.g. "folders", "files"
+    jsonFunction jsonFunc;  // function to be called to get json-like string
+    int jsonFuncParam;  // parameter passed to the jsonFunc
 };
 
 static struct mappedRoute registeredRoutes[] = {
@@ -29,7 +37,12 @@ static struct mappedRoute registeredRoutes[] = {
     {GET, "/404", "files/404.html", SC_NOT_FOUND},
 };
 
-static char *allowedExt[] = {"css", "js", "html", "png", "jpg", "jpeg"};
+static struct apiRoute registeredApiRoutes[] = {
+    {"folders", getTableJson, DB_FOLDERS_TABLE},
+    {"files", getTableJson, DB_FILES_TABLE}
+};
+
+static char *allowedExt[] = {"css", "js", "html", "png", "jpg", "jpeg", "json"};
 static char *imageExt[] = {"png", "jpg", "jpeg"};
 
 
@@ -53,21 +66,24 @@ int isApiRequest(char *requestRoute) {
     return strncmp(requestRoute, api, strlen(api)) == 0;
 }
 
-int getApiResponse(char *requestRoute) {
+struct data getApiBody(char *requestRoute) {
     strtok(requestRoute, "/");  // remove first part of route (/api)
     char *APIrequestType = strtok(NULL, "?");
     char *APIrequestParams = strtok(NULL, "");
-    printf("%s, %s\n", APIrequestType, APIrequestParams);
 
-    if (strcmp(APIrequestType, "folders") == 0) {
-        struct data foldersJson = getTableJson(DB_FOLDERS_TABLE);
-        printf("f: %s (size: %d)\n", foldersJson.contents, foldersJson.size);
+    // find matching registered api
+    int nRegistered = sizeof(registeredApiRoutes) / sizeof(registeredApiRoutes[0]);
+    struct apiRoute apiRoute;
+    for (int i = 0; i < nRegistered; i++) {
+        struct apiRoute r = registeredApiRoutes[i];
+        if (strcmp(r.type, APIrequestType) == 0) {
+            apiRoute = r;
+            break;
+        }
     }
-    if (strcmp(APIrequestType, "files") == 0) {
-        struct data filesJson = getTableJson(DB_FILES_TABLE);
-        printf("f: %s (size: %d)\n", filesJson.contents, filesJson.size);
-    }
-    return 1;
+
+    struct data bodyData = apiRoute.jsonFunc(apiRoute.jsonFuncParam);
+    return bodyData;
 }
 
 struct mappedRoute getMappedRoute(char *requestType, char *requestRoute) {
@@ -76,7 +92,7 @@ struct mappedRoute getMappedRoute(char *requestType, char *requestRoute) {
     char *pathExt = getFileExt(requestRoute);
 
     int nRegistered = sizeof(registeredRoutes) / sizeof(registeredRoutes[0]);
-    struct mappedRoute route = registeredRoutes[nRegistered - 1];
+    struct mappedRoute route = registeredRoutes[nRegistered - 1];  // 404 by default
 
     // find route
     if (strcmp(pathExt, "") == 0) {
@@ -108,19 +124,22 @@ char *getContentType(char *ext) {
             type = "image";
         }
     }
+    if (strcmp(ext, "json") == 0) {
+        type = "application";
+    }
     return type;
 }
 
-struct data getHeader(struct mappedRoute routeMap, int bodySize) {
+struct data getHeader(char *templateExt, char *statusCode, int bodySize) {
     struct data header;
-    char *templateExt = getFileExt(routeMap.template);
+    // char *templateExt = getFileExt(routeMap.template);
     
     header.contents = malloc(HEADER_SIZE);
     memset(header.contents, 0, HEADER_SIZE);
     snprintf(header.contents, HEADER_SIZE,  "HTTP/1.1 %s\r\n"
                                             "Content-Type: %s/%s\r\n"
                                             "Content-Length: %d\r\n"
-                                            "Accept-Ranges: bytes\r\n\r\n", routeMap.statusCode, getContentType(templateExt), templateExt, bodySize);
+                                            "Accept-Ranges: bytes\r\n\r\n", statusCode, getContentType(templateExt), templateExt, bodySize);
     
     header.size = strlen(header.contents);
     return header;
@@ -151,13 +170,14 @@ struct HTTPResponse getResponse(char *request) {
     char *requestRoute = strtok(NULL, " ");
 
     if (!isApiRequest(requestRoute)) {
-        // find pre-mapped struct for request
+        // handle HTTP request
         struct mappedRoute routeMap = getMappedRoute(requestType, requestRoute);
         response.body = getBody(routeMap);
-        response.header = getHeader(routeMap, response.body.size);
+        response.header = getHeader(getFileExt(routeMap.template), routeMap.statusCode, response.body.size);
     } else {
         // handle API request
-        getApiResponse(requestRoute);
+        response.body = getApiBody(requestRoute);
+        response.header = getHeader("json", SC_ACCEPT, response.body.size);
     }
     return response;
 }

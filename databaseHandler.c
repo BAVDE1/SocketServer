@@ -45,7 +45,7 @@ char *getFolderJsonFromStmt(sqlite3_stmt *stmt) {
     fldr.name = sqlite3_column_text(stmt, 1);
     fldr.folder_order = sqlite3_column_int(stmt, 2);
 
-    sprintf(string, "{id: %d, name: '%s', folder_order: %d},", fldr.id, fldr.name, fldr.folder_order);
+    sprintf(string, "{\"id\": %d, \"name\": \"%s\", \"folder_order\": %d},", fldr.id, fldr.name, fldr.folder_order);
     return string;
 }
 
@@ -60,7 +60,7 @@ char *getFileJsonFromStmt(sqlite3_stmt *stmt) {
     file.folder_id = sqlite3_column_int(stmt, 3);
     file.last_updated = sqlite3_column_text(stmt, 4);
 
-    sprintf(string, "{id: %d, name: '%s', path: '%s', folder_id: %d, last_updated: '%s'},", file.id, file.name, file.path, file.folder_id, file.last_updated);
+    sprintf(string, "{\"id\": %d, \"name\": \"%s\", \"path\": \"%s\", \"folder_id\": %d, \"last_updated\": \"%s\"},", file.id, file.name, file.path, file.folder_id, file.last_updated);
     return string;
 }
 
@@ -98,17 +98,17 @@ struct data getTableJson(int DBtable) {
     struct data data;
     if (strlen(objects) > 0) {
         objects[strlen(objects)-1] = '\0';  // remove trailing comma
-        data.size = strlen(objects) + 3;  // +2 for square brackets, +1 for null
+        data.size = strlen(objects) + 2;  // +2 for square brackets
         data.contents = malloc(data.size);
-        snprintf(data.contents, data.size, "[%s]", objects);
+        snprintf(data.contents, data.size + 1, "[%s]", objects);  // +1 for null
     } else {
         // no objects, return empty list
         data.size = 3;
         data.contents = "[]";
     }
 
-    int f = sqlite3_finalize(stmt);
-    int c = sqlite3_close(db);
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
     return data;
 }
 
