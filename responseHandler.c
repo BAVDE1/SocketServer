@@ -17,9 +17,9 @@ struct HTTPResponse {
 };
 
 struct mappedRoute {
-    char *type;  // GET POST
-    char *route;  // /
-    char *template;  // filepath
+    char *type;  // GET, POST
+    char *route;
+    char *template;  // template filepath
     char *statusCode;  // 200
 };
 
@@ -60,8 +60,12 @@ int getApiResponse(char *requestRoute) {
     printf("%s, %s\n", APIrequestType, APIrequestParams);
 
     if (strcmp(APIrequestType, "folders") == 0) {
-        struct data foldersJson = getTableJson(DB_FILES_TABLE);
+        struct data foldersJson = getTableJson(DB_FOLDERS_TABLE);
         printf("f: %s (size: %d)\n", foldersJson.contents, foldersJson.size);
+    }
+    if (strcmp(APIrequestType, "files") == 0) {
+        struct data filesJson = getTableJson(DB_FILES_TABLE);
+        printf("f: %s (size: %d)\n", filesJson.contents, filesJson.size);
     }
     return 1;
 }

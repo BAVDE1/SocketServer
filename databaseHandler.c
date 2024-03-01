@@ -19,10 +19,10 @@ struct folder {
 
 struct file {
     int id;
-    char *name;
-    char *path;
+    const unsigned char *name;
+    const unsigned char *path;
     int folder_id;
-    char *last_updated;
+    const unsigned char *last_updated;
 };
 
 
@@ -49,6 +49,21 @@ char *getFolderJsonFromStmt(sqlite3_stmt *stmt) {
     return string;
 }
 
+char *getFileJsonFromStmt(sqlite3_stmt *stmt) {
+    // return json-like string containing elements of the given file row from db
+    char *string = "";
+
+    struct file file;
+    file.id = sqlite3_column_int(stmt, 0);
+    file.name = sqlite3_column_text(stmt, 1);
+    file.path = sqlite3_column_text(stmt, 2);
+    file.folder_id = sqlite3_column_int(stmt, 3);
+    file.last_updated = sqlite3_column_text(stmt, 4);
+
+    sprintf(string, "{id: %d, name: '%s', path: '%s', folder_id: %d, last_updated: '%s'},", file.id, file.name, file.path, file.folder_id, file.last_updated);
+    return string;
+}
+
 struct data getTableJson(int DBtable) {
     // return json-like string of rows from given table
     sqlite3 *db = connectToDB();
@@ -61,25 +76,33 @@ struct data getTableJson(int DBtable) {
     // prep query
     int prep = sqlite3_prepare_v2(db, query, -1, &stmt, NULL);
 
-    char objects[1024] = "";
+    char *objects = malloc(1024);
+    memset(objects, 0, 1024);
 
     // loop through each row returned from query, store json-like string into `objects`
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         char *addition;
-        if (DBtable == DB_FOLDERS_TABLE) {
+        switch (DBtable) {
+        case DB_FOLDERS_TABLE:
             addition = getFolderJsonFromStmt(stmt);
+            break;
+        case DB_FILES_TABLE:
+            addition = getFileJsonFromStmt(stmt);
+            break;
+        default:
+            break;
         }
-        snprintf(objects, strlen(objects) + strlen(addition), "%s%s", objects, addition);
+        snprintf(objects, strlen(objects) + strlen(addition) + 1, "%s%s", objects, addition);  // +1 for null
     }
 
     struct data data;
     if (strlen(objects) > 0) {
         objects[strlen(objects)-1] = '\0';  // remove trailing comma
-        data.size = strlen(objects) + 3;  // +2 for square brackets, +1 for \0
+        data.size = strlen(objects) + 3;  // +2 for square brackets, +1 for null
         data.contents = malloc(data.size);
         snprintf(data.contents, data.size, "[%s]", objects);
     } else {
-        // no objects, empty list
+        // no objects, return empty list
         data.size = 3;
         data.contents = "[]";
     }
