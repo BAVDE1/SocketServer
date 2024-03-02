@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>View File</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="description" content=""/>
+  
+  <link rel="stylesheet" href="files/static/style.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script type="text/javascript" src="files/static/common.js"></script>
+</head>
+
+<script>
+  $(document).ready(function () {
+    // load file
+    // console.log(load);
+    AjaxRequest("/api/files", findFile);
+  });
+
+  function findFile(data) {
+    data = JSON.parse(data);
+    fileId = window.location.href.split("=").slice(-1)[0];
+    dateElem = document.getElementById("last-updated");
+    for (let i = 0; i < data.length; i++) {
+      d = data[i];
+      if (d.id == fileId) {
+        // Found matching id, load file
+        AjaxRequest(d.path, loadFile);
+        if (dateElem) {
+            console.log(d);
+            dateElem.innerHTML = d.last_updated;
+        }
+      }
+    }
+  }
+
+  function loadFile(data) {
+    pageElem = document.getElementById("page-contents");
+    
+    if (pageElem) {
+        lines = data.split("\r\n")
+        firstLine = `<div class="header-main">${lines[0]}</div>`
+        pageElem.innerHTML = firstLine;
+
+        for (let i = 1; i < lines.length; i++) {
+            line = `${lines[i]}<br>`
+            if (line.startsWith("# ")) {
+                line = `<div class="header-1">${lines[i].substring(2)}</div>`
+            }
+            if (line.startsWith("## ")) {
+                line = `<div class="header-2">${lines[i].substring(3)}</div>`
+            }
+            pageElem.innerHTML += line;
+        }
+    }
+  }
+</script>
+
+<body>
+  <div class="include-navbar"></div>
+  <div id="page" class="page">
+    <div id="last-updated" class="last-updated"></div>
+    <div class="last-updated-p"></div>
+    <div class="last-updated-p1"></div>
+    <!-- last updated -->
+    <div id="page-contents">
+        <p><strong>Loading file...</strong></p>
+    </div>
+  </div>
+</body>
+
+</html>

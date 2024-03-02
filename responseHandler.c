@@ -34,6 +34,7 @@ struct apiRoute {
 
 static struct mappedRoute registeredRoutes[] = {
     {GET, "/", "files/index.html", SC_ACCEPT},
+    {GET, "/view_file", "files/view_file.html", SC_ACCEPT},
 
     {GET, "/404", "files/404.html", SC_NOT_FOUND},
 };
@@ -64,9 +65,9 @@ int isAllowedExt(char *ext) {
     return allowed;
 }
 
-int isApiRequest(char *requestRoute) {
-    char *api = "/api/";
-    return strncmp(requestRoute, api, strlen(api)) == 0;
+int stringStartsWith(char *string, char *token) {
+    // returns whether given string starts with given token
+    return strncmp(string, token, strlen(token)) == 0;
 }
 
 struct data get404Json(int i) {
@@ -180,9 +181,10 @@ struct HTTPResponse getResponse(char *request) {
     struct HTTPResponse response;
 
     char *requestType = strtok(request, " ");
-    char *requestRoute = strtok(NULL, " ");
+    char *requestRoute = strtok(NULL, "?");  // stop at params
+    strtok(requestRoute, " ");  // stop at end of route
 
-    if (!isApiRequest(requestRoute)) {
+    if (!stringStartsWith(requestRoute, "/api/")) {
         // handle HTTP request
         struct mappedRoute routeMap = getMappedRoute(requestType, requestRoute);
         response.body = getBody(routeMap);

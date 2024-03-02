@@ -6,6 +6,7 @@
   });
 
   function loadFolders(data) {
+    data = JSON.parse(data);
     contents = "";
     for (let i = 0; i < data.length; i++) {
       d = data[i];
@@ -17,12 +18,13 @@
   };
 
   function loadFiles(data) {
+    data = JSON.parse(data);
     for (let i = 0; i < data.length; i++) {
       d = data[i];
       folderElem = document.getElementById("folder-" + d.folder_id);
       if (folderElem) {
         contents = folderElem.innerHTML;
-        contents += `<li><a href="${d.path}">${d.name}</a></li>`;
+        contents += `<li><a href="view_file?id=${d.id}">${d.name}</a></li>`;
         folderElem.innerHTML = contents;
       }
     }
@@ -45,24 +47,7 @@
 
   <div class="nav-list">
     <ul id="folders" class="folders">
-      <p><strong>Loading files...</strong></p>
-      <!-- <li>
-        folder a
-
-        <ul class="items">
-          <li>item a.a</li>
-          <li>item a.b</li>
-          <li>item a.c</li>
-        </ul>
-      </li>
-      
-      <li>
-        folder b
-
-        <ul class="items">
-          <li>item b.a</li>
-        </ul>
-      </li> -->
+      <p><strong>Loading database...</strong></p>
     </ul>
   </div>
 

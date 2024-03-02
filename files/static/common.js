@@ -11,7 +11,7 @@ function AjaxRequest(url, onSuccess) {
     xhr.onload = (event) => {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
-                onSuccess(JSON.parse(xhr.responseText));
+                onSuccess(xhr.responseText);
             } else {
                 console.error("Ajax did not recieve 200: " + xhr.statusText);
             }
