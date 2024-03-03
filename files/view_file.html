@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>View File</title>
+  <title id="title">View File</title>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta name="description" content=""/>
   
@@ -22,14 +22,21 @@
     data = JSON.parse(data);
     fileId = window.location.href.split("=").slice(-1)[0];
     dateElem = document.getElementById("last-updated");
+    titleElem = document.getElementById("title");
+
     for (let i = 0; i < data.length; i++) {
       d = data[i];
       if (d.id == fileId) {
         // Found matching id, load file
         AjaxRequest(d.path, loadFile);
+
+        // last updated
         if (dateElem) {
-            console.log(d);
             dateElem.innerHTML = d.last_updated;
+        }
+        // title
+        if (titleElem) {
+            titleElem.innerHTML += " - " + d.id
         }
       }
     }
@@ -44,14 +51,21 @@
         pageElem.innerHTML = firstLine;
 
         for (let i = 1; i < lines.length; i++) {
-            line = `${lines[i]}<br>`
-            if (line.startsWith("# ")) {
-                line = `<div class="header-1">${lines[i].substring(2)}</div>`
+            if (lines[i]) {
+                // normal line
+                line = `${lines[i]}<br>`
+
+                // header lines
+                if (line.startsWith("# ")) {
+                    line = `<div class="header-1">${lines[i].substring(2)}</div>`
+                }
+                if (line.startsWith("## ")) {
+                    line = `<div class="header-2">${lines[i].substring(3)}</div>`
+                }
+
+                // add to page
+                pageElem.innerHTML += line;
             }
-            if (line.startsWith("## ")) {
-                line = `<div class="header-2">${lines[i].substring(3)}</div>`
-            }
-            pageElem.innerHTML += line;
         }
     }
   }

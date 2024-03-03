@@ -1,5 +1,14 @@
 
 <script>
+  function trimName(name) {
+    maxLength = 18;
+    if (name.length > maxLength) {
+      name = name.substring(0, maxLength);
+      name += "...";
+    }
+    return name;
+  }
+  
   $(document).ready(function () {
     // load folders, then files
     AjaxRequest("/api/folders", loadFolders);
@@ -10,7 +19,7 @@
     contents = "";
     for (let i = 0; i < data.length; i++) {
       d = data[i];
-      contents += `<li>${d.name}<ul id="folder-${d.id}" class="items"></ul></li>`;
+      contents += `<li>${trimName(d.name)}<ul id="folder-${d.id}" class="items"></ul></li>`;
     }
     document.getElementById("folders").innerHTML = contents;
 
@@ -24,7 +33,8 @@
       folderElem = document.getElementById("folder-" + d.folder_id);
       if (folderElem) {
         contents = folderElem.innerHTML;
-        contents += `<li><a href="view_file?id=${d.id}">${d.name}</a></li>`;
+
+        contents += `<li><a href="view_file?id=${d.id}">${trimName(d.name)}</a></li>`;
         folderElem.innerHTML = contents;
       }
     }
