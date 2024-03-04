@@ -24,3 +24,52 @@ function AjaxRequest(url, onSuccess) {
 
     xhr.send(null);
 }
+
+
+function findFileCommon(data, dateElem, titleElem, loadFileFunc) {
+    data = JSON.parse(data);
+    fileId = window.location.href.split("=").slice(-1)[0];
+
+    for (let i = 0; i < data.length; i++) {
+        d = data[i];
+        if (d.id == fileId) {
+            // Found matching id, load file
+            AjaxRequest(d.path, loadFileFunc);
+    
+            // last updated
+            if (dateElem) {
+                dateElem.innerHTML = d.last_updated;
+            }
+            // title
+            if (titleElem) {
+                titleElem.innerHTML += " - " + d.id
+            }
+        }
+    }
+}
+
+function loadFileCommon(data, pageElem) {
+    if (pageElem) {
+        lines = data.split("\r\n")
+        firstLine = `<div class="header-main">${lines[0]}</div>`
+        pageElem.innerHTML = firstLine;
+
+        for (let i = 1; i < lines.length; i++) {
+            if (lines[i]) {
+                // normal line
+                line = `${lines[i]}<br>`
+
+                // header lines
+                if (line.startsWith("# ")) {
+                    line = `<div class="header-1">${lines[i].substring(2)}</div>`
+                }
+                if (line.startsWith("## ")) {
+                    line = `<div class="header-2">${lines[i].substring(3)}</div>`
+                }
+
+                // add to page
+                pageElem.innerHTML += line;
+            }
+        }
+    }
+}

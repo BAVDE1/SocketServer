@@ -179,3 +179,27 @@ body {
     width: 20px;
     right: 145px;
 }
+
+.warning {
+    text-align: center;
+    color: red;
+    border-top: 7px solid;
+    border-bottom: 7px solid;
+    margin-bottom: 20px;
+}
+
+.warning-a {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.warning-b {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    letter-spacing: 12px;
+    font-weight: 900;
+    text-shadow: 0px 2px, 2px 0px, 2px 2px;
+    font-size: xx-large;
+}
