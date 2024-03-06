@@ -214,6 +214,7 @@ body {
 }
 
 .edit-area {
+    margin-top: 40px;
     width: 100%;
     min-height: 500px;
     padding: 12px 20px;
@@ -223,4 +224,35 @@ body {
     background-color: #f8f8f8;
     font-size: 16px;
     resize: none;
+}
+
+.edit-options {
+    position: absolute;
+    font-size: 13px;
+    font-weight: bold;
+    background-color: rgb(150, 150, 150);
+    padding-top: 12px;
+    padding-right: 25px;
+    text-align: right;
+    width: 145px;
+    height: 28px;
+    top: 0;
+    right: 0;
+}
+
+.edit-options-p, .edit-options-p1 {
+    position: absolute;
+	width: 20px;
+	height: 40px;
+    right: 160px;
+    top: 0px;
+	transform: skew(20deg);
+	background: rgb(150, 150, 150);
+
+    margin-left: calc(100% - 60px);
+}
+
+.edit-options-p1 {
+    width: 20px;
+    right: 195px;
 }

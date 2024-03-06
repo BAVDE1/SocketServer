@@ -28,7 +28,8 @@ function AjaxRequest(url, onSuccess) {
 
 function findFileCommon(data, dateElem, titleElem, loadFileFunc) {
     data = JSON.parse(data);
-    fileId = window.location.href.split("=").slice(-1)[0];
+    var fileId = window.location.href.split("=").slice(-1)[0];
+    fileId = fileId.split("#")[0];
 
     for (let i = 0; i < data.length; i++) {
         d = data[i];

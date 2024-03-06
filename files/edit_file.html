@@ -12,6 +12,11 @@
 </head>
 
 <script>
+  // popup
+  window.onbeforeunload = function() {
+    return true;
+  };
+
   $(document).ready(function () {
     // load file
     AjaxRequest("/api/files", findFile);
@@ -21,6 +26,11 @@
     dateElem = document.getElementById("last-updated");
     titleElem = document.getElementById("title");
     var id = findFileCommon(data, dateElem, titleElem, loadFile);
+
+    // buttons
+    $("#save-btn").attr("href", `#`);
+    $("#save-btn").attr("onClick", `saveFile(${id}, "edit-area")`);
+    $("#view-btn").attr("href", `view_file?id=${id}`);
   }
 
   function loadFile(data) {
@@ -28,13 +38,27 @@
     loadFileCommon(data, pageElem, false);
     pageElem.dispatchEvent(new InputEvent("input"));
   }
+
+  function saveFile(id, elemId) {
+    console.log(id, elemId);
+
+    var contents = document.getElementById(elemId).innerHTML;
+    console.log(contents);
+  }
 </script>
 
 <body>
   <div class="include-navbar"></div>
   
   <div id="page" class="page">
-    <a>Save</a>
+    <div id="edit-options" class="edit-options">
+      <a id="save-btn">Save</a>
+      |
+      <a id="view-btn">View File</a>
+    </div>
+    <div class="edit-options-p"></div>
+    <div class="edit-options-p1"></div>
+
     <textarea id="edit-area" class="edit-area">Loading file...</textarea>
 
     <script type="text/javascript">

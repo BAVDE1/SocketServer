@@ -23,10 +23,7 @@
     var id = findFileCommon(data, dateElem, titleElem, loadFile);
 
     // edit button
-    editElem = document.getElementById("edit-icon");
-    if (editElem) {
-      editElem.setAttribute('href', `edit_file?=${id}`);
-    }
+    document.getElementById("edit-icon").setAttribute('href', `edit_file?=${id}`);
   }
 
   function loadFile(data) {
