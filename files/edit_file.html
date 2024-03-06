@@ -21,17 +21,12 @@
     dateElem = document.getElementById("last-updated");
     titleElem = document.getElementById("title");
     var id = findFileCommon(data, dateElem, titleElem, loadFile);
-
-    // edit button
-    editElem = document.getElementById("edit-icon");
-    if (editElem) {
-      editElem.setAttribute('href', `edit_file?=${id}`);
-    }
   }
 
   function loadFile(data) {
-    pageElem = document.getElementById("page-contents");
-    loadFileCommon(data, pageElem);
+    pageElem = document.getElementById("edit-area");
+    loadFileCommon(data, pageElem, false);
+    pageElem.dispatchEvent(new InputEvent("input"));
   }
 </script>
 
@@ -39,17 +34,19 @@
   <div class="include-navbar"></div>
   
   <div id="page" class="page">
+    <a>Save</a>
+    <textarea id="edit-area" class="edit-area">Loading file...</textarea>
 
-    <div id="last-updated" class="last-updated"></div>
-    <div class="last-updated-p"></div>
-    <div class="last-updated-p1"></div>
+    <script type="text/javascript">
+        textarea = document.querySelector("#edit-area");
+        textarea.addEventListener('input', autoResize, false);
 
-    <a id="edit-icon" class="edit-icon"><img src="files/images/edit.png" width="25"></a>
-    
-    <div id="page-contents">
-        <p><strong>Loading file...</strong></p>
-    </div>
-
+        function autoResize() {
+            this.style.height = 'auto';
+            var sc = this.scrollHeight + 10;
+            this.style.height = sc + 'px';
+        }
+    </script>
   </div>
 </body>
 

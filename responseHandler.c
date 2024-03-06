@@ -35,6 +35,7 @@ struct apiRoute {
 static struct mappedRoute registeredRoutes[] = {
     {GET, "/", "files/index.html", SC_ACCEPT},
     {GET, "/view_file", "files/view_file.html", SC_ACCEPT},
+    {GET, "/edit_file", "files/edit_file.html", SC_ACCEPT},
 
     {GET, "/404", "files/404.html", SC_NOT_FOUND},
 };

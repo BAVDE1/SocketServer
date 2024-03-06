@@ -44,32 +44,50 @@ function findFileCommon(data, dateElem, titleElem, loadFileFunc) {
             if (titleElem) {
                 titleElem.innerHTML += " - " + d.id
             }
+            return d.id;
         }
     }
 }
 
-function loadFileCommon(data, pageElem) {
-    if (pageElem) {
-        lines = data.split("\r\n")
-        firstLine = `<div class="header-main">${lines[0]}</div>`
-        pageElem.innerHTML = firstLine;
+function loadFileFormatted(data, pageElem) {
+    lines = data.split("\r\n")
+    firstLine = `<div class="header-main">${lines[0]}</div>`
+    pageElem.innerHTML = firstLine;
 
-        for (let i = 1; i < lines.length; i++) {
-            if (lines[i]) {
-                // normal line
-                line = `${lines[i]}<br>`
+    for (let i = 1; i < lines.length; i++) {
+        if (lines[i]) {
+            // normal line
+            line = `${lines[i]}<br>`
 
-                // header lines
-                if (line.startsWith("# ")) {
-                    line = `<div class="header-1">${lines[i].substring(2)}</div>`
-                }
-                if (line.startsWith("## ")) {
-                    line = `<div class="header-2">${lines[i].substring(3)}</div>`
-                }
-
-                // add to page
-                pageElem.innerHTML += line;
+            // header lines
+            if (line.startsWith("# ")) {
+                line = `<div class="header-1">${lines[i].substring(2)}</div>`
             }
+            if (line.startsWith("## ")) {
+                line = `<div class="header-2">${lines[i].substring(3)}</div>`
+            }
+
+            // add to page
+            pageElem.innerHTML += line;
         }
     }
+}
+
+function loadFilePlain(data, pageElem) {
+    lines = data.split("\r\n");
+    pageElem.innerHTML = lines[0];
+    for (let i = 1; i < lines.length; i++) {
+        line = "\r\n" + lines[i];
+        pageElem.innerHTML += line;
+    }
+}
+
+function loadFileCommon(data, pageElem, formatted=true) {
+    if (pageElem) {
+        if (formatted) {
+            loadFileFormatted(data, pageElem);
+        } else {
+            loadFilePlain(data, pageElem);
+        }
+    }    
 }
